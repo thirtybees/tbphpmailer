@@ -1,0 +1,19 @@
+{
+    "name": "thirtybees/tbphpmailer",
+    "description": "This module implements mail functionality using PHPmailer library",
+    "license": "AFL 3.0",
+    "authors": [
+        {
+            "name": "thirtybees",
+            "email": "contact@thirtybees.com"
+        }
+    ],
+    "require": {
+        "phpmailer/phpmailer": "^6.8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "TbPhpMailerModule\\": "src/"
+        }
+    }
+}
