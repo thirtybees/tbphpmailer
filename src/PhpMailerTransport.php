@@ -31,10 +31,6 @@ use Translate;
 
 class PhpMailerTransport implements MailTransport
 {
-    const TYPE_HTML = 1;
-    const TYPE_TEXT = 2;
-    const TYPE_BOTH = 3;
-
     /**
      * @return string
      */
@@ -101,10 +97,6 @@ class PhpMailerTransport implements MailTransport
         array       $attachements
     ): bool
     {
-        $mailMethod = (int) $this->getConfig('PS_MAIL_METHOD', $idShop, TbPhpMailer::MAIL_METHOD_NONE);
-        if ($mailMethod === TbPhpMailer::MAIL_METHOD_NONE) {
-            return true;
-        }
         $message = new PHPMailer(true);
         $message->isSMTP();
         $message->CharSet = 'UTF-8';

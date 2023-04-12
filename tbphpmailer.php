@@ -24,9 +24,6 @@ if (!defined('_TB_VERSION_')) {
 
 class TbPhpMailer extends Module
 {
-    const MAIL_METHOD_MAIL = 1;
-    const MAIL_METHOD_SMTP = 2;
-    const MAIL_METHOD_NONE = 3;
     const SUBMIT = 'submitSettings';
 
     /**
@@ -89,25 +86,6 @@ class TbPhpMailer extends Module
                 'title' => $this->l('Settings'),
                 'icon' => 'icon-cogs',
                 'fields' => [
-                    'PS_MAIL_METHOD' => [
-                        'title' => 'Mail method',
-                        'validation' => 'isGenericName',
-                        'type' => 'radio',
-                        'required' => true,
-                        'choices' => [
-                            static::MAIL_METHOD_SMTP => $this->l('SMTP'),
-                            static::MAIL_METHOD_MAIL => $this->l('PHP mail() function'),
-                            static::MAIL_METHOD_NONE => $this->l('Never send emails'),
-                        ],
-                    ],
-                    'PS_MAIL_DOMAIN' => [
-                        'title' => $this->l('Mail domain name'),
-                        'hint' => $this->l('Fully qualified domain name (keep this field empty if you don\'t know).'),
-                        'empty' => true,
-                        'validation' => 'isUrl',
-                        'type' => 'text',
-                        'class' => 'fixed-width-xxl',
-                    ],
                     'PS_MAIL_SERVER' => [
                         'title' => $this->l('SMTP server'),
                         'hint' => $this->l('IP address or server name (e.g. smtp.mydomain.com).'),
@@ -171,8 +149,6 @@ class TbPhpMailer extends Module
      */
     private function updateOptions()
     {
-        Configuration::updateValue('PS_MAIL_METHOD', (int) Tools::getValue('PS_MAIL_METHOD'));
-        Configuration::updateValue('PS_MAIL_DOMAIN', Tools::getValue('PS_MAIL_DOMAIN'));
         Configuration::updateValue('PS_MAIL_SERVER', Tools::getValue('PS_MAIL_SERVER'));
         Configuration::updateValue('PS_MAIL_USER', Tools::getValue('PS_MAIL_USER'));
         Configuration::updateValue('PS_MAIL_SMTP_ENCRYPTION', Tools::getValue('PS_MAIL_SMTP_ENCRYPTION'));
