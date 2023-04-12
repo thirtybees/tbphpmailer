@@ -12,6 +12,7 @@
  * obtain it through the world-wide-web, please send an email
  * to license@thirtybees.com so we can send you a copy immediately.
  *
+ * @author    E-Com <e-com@presta.eu.org>
  * @author    thirty bees <modules@thirtybees.com>
  * @copyright 2022 - 2022 thirty bees
  * @license   Academic Free License (AFL 3.0)
