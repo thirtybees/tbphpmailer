@@ -83,7 +83,6 @@ class PhpMailerTransport implements MailTransport
         $message->MessageID = $this->generateId();
         $message->SMTPAuth = true;
         $message->SMTPDebug = false;
-        $message->isHTML(true);
         $message->Username = $this->getConfig('PS_MAIL_USER', $idShop);
         $message->Password = $this->getConfig('PS_MAIL_PASSWD', $idShop);
         $encryption = $this->getConfig('PS_MAIL_SMTP_ENCRYPTION', $idShop);
@@ -103,27 +102,29 @@ class PhpMailerTransport implements MailTransport
             $message->addBCC($bccAddress->getAddress(), $bccAddress->getName());
         }
         $templateVars = $this->processTemplateVars($templateVars, $message);
+
+        $htmlBody = null;
+        $txtBody = null;
+
         foreach ($templates as $template) {
             $templateType = $template->getContentType();
             if ($templateType == 'text/html') {
                 $htmlBody = $template->renderTemplate($templateVars);
-                $htmlBody = str_replace('{shop_logo}', 'cid:shop_logo', $htmlBody);
             }
             if ($templateType == 'text/plain') {
                 $txtBody = $template->renderTemplate($templateVars);
             }
         }
-        $mailType = (int) $this->getConfig('PS_MAIL_TYPE', $idShop);
-        if (!in_array($mailType, [static::TYPE_BOTH, static::TYPE_TEXT, static::TYPE_HTML])) {
-            $mailType = static::TYPE_BOTH;
-        }
-        $sendTxtContent = $mailType === static::TYPE_BOTH || $mailType === static::TYPE_TEXT;
-        $sendHtmlContent = $mailType === static::TYPE_BOTH || $mailType === static::TYPE_HTML;
-        if ($sendTxtContent) {
-            $message->Body = $txtBody;
-        }
-        if ($sendHtmlContent) {
+
+        if ($htmlBody) {
+            $message->isHTML(true);
             $message->Body = $htmlBody;
+            if ($txtBody) {
+                $message->AltBody = $txtBody;
+            }
+        } elseif($txtBody) {
+            $message->isHTML(false);
+            $message->Body = $txtBody;
         }
         foreach ($attachements as $attachement) {
             $message->addStringAttachment($attachement->getContent(), $attachement->getName());
@@ -140,23 +141,14 @@ class PhpMailerTransport implements MailTransport
         return $value;
     }
 
-    private function useDecorator(array $templates)
+    private function processTemplateVars(array $templateVars, PHPMailer $message)
     {
-        foreach ($templates as $template) {
-            if (!($template instanceof SimpleMailTemplate)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private function processTemplateVars(array $templateVars, $message)
-    {
-        foreach ($templateVars as &$parameter) {
+        foreach ($templateVars as $key => &$parameter) {
             if (is_array($parameter) && isset($parameter['type']) && $parameter['type'] === 'imageFile') {
                 $filePath = $parameter['filepath'];
-                if ($filePath && file_exists($filePath)) {
-                    $parameter = $message->addEmbeddedImage($filePath, 'shop_logo');
+                $cid = str_replace(['{', '}'], '', $key);
+                if ($filePath && file_exists($filePath) && $message->addEmbeddedImage($filePath, $cid)) {
+                    $parameter = "cid:$cid";
                 } else {
                     $parameter = '';
                 }
