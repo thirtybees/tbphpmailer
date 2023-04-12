@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2022-2022 thirty bees
+ * Copyright (C) 2023-2023 thirty bees
  *
  * NOTICE OF LICENSE
  *
@@ -14,7 +14,7 @@
  *
  * @author    E-Com <e-com@presta.eu.org>
  * @author    thirty bees <modules@thirtybees.com>
- * @copyright 2022 - 2022 thirty bees
+ * @copyright 2023 - 2023 thirty bees
  * @license   Academic Free License (AFL 3.0)
  */
 
@@ -29,6 +29,9 @@ class TbPhpMailer extends Module
     const MAIL_METHOD_NONE = 3;
     const SUBMIT = 'submitSettings';
 
+    /**
+     * @throws PrestaShopException
+     */
     public function __construct()
     {
         $this->name = 'tbphpmailer';
@@ -45,6 +48,11 @@ class TbPhpMailer extends Module
         $this->tb_min_version = '1.5.0';
     }
 
+    /**
+     * @return bool
+     *
+     * @throws PrestaShopException
+     */
     public function install()
     {
         return (
@@ -59,6 +67,10 @@ class TbPhpMailer extends Module
         return new TbPhpMailerModule\PhpMailerTransport();
     }
 
+    /**
+     * @throws PrestaShopException
+     * @throws SmartyException
+     */
     public function getContent()
     {
         $html = '';
@@ -154,6 +166,9 @@ class TbPhpMailer extends Module
         ]);
     }
 
+    /**
+     * @throws PrestaShopException
+     */
     private function updateOptions()
     {
         Configuration::updateValue('PS_MAIL_METHOD', (int) Tools::getValue('PS_MAIL_METHOD'));

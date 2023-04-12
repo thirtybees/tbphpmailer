@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2022-2022 thirty bees
+ * Copyright (C) 2023-2023 thirty bees
  *
  * NOTICE OF LICENSE
  *
@@ -14,7 +14,7 @@
  *
  * @author    E-Com <e-com@presta.eu.org>
  * @author    thirty bees <modules@thirtybees.com>
- * @copyright 2022 - 2022 thirty bees
+ * @copyright 2023 - 2023 thirty bees
  * @license   Academic Free License (AFL 3.0)
  */
 
@@ -22,16 +22,11 @@ namespace TbPhpMailerModule;
 
 use Configuration;
 use Context;
+use PHPMailer\PHPMailer\Exception as PHPMailerException;
 use PrestaShopException;
 use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use TbPhpMailer;
 use Thirtybees\Core\Mail\MailAddress;
-use Thirtybees\Core\Mail\MailAttachement;
-use Thirtybees\Core\Mail\MailTemplate;
 use Thirtybees\Core\Mail\MailTransport;
-use Thirtybees\Core\Mail\Template\SimpleMailTemplate;
-use Tools;
 use Translate;
 
 class PhpMailerTransport implements MailTransport
@@ -40,26 +35,59 @@ class PhpMailerTransport implements MailTransport
     const TYPE_TEXT = 2;
     const TYPE_BOTH = 3;
 
+    /**
+     * @return string
+     */
     public function getName(): string
     {
         return $this->l('PHPmailer');
     }
 
-    public function l($string)
+    /**
+     * @param string $string
+     *
+     * @return string
+     */
+    public function l(string $string): string
     {
         return Translate::getModuleTranslation('tbphpmailer', $string, 'tbphpmailer');
     }
 
+    /**
+     * @return string
+     */
     public function getDescription(): string
     {
         return $this->l('Sends email using PHPmailer library');
     }
 
+    /**
+     * @return string
+     *
+     * @throws PrestaShopException
+     */
     public function getConfigUrl()
     {
         return Context::getContext()->link->getAdminLink('AdminModules', true, ['configure' => 'tbphpmailer']);
     }
 
+    /**
+     * @param int $idShop
+     * @param int $idLang
+     * @param MailAddress $fromAddress
+     * @param array $toAddresses
+     * @param array $bccAddresses
+     * @param MailAddress $replyTo
+     * @param string $subject
+     * @param array $templates
+     * @param array $templateVars
+     * @param array $attachements
+     *
+     * @return bool
+     *
+     * @throws PHPMailerException
+     * @throws PrestaShopException
+     */
     public function sendMail(
         int         $idShop,
         int         $idLang,
@@ -133,6 +161,9 @@ class PhpMailerTransport implements MailTransport
         return $message->send();
     }
 
+    /**
+     * @throws PrestaShopException
+     */
     private function getConfig($key, $idShop, $default = null)
     {
         $value = Configuration::get($key, null, null, $idShop);
@@ -142,6 +173,9 @@ class PhpMailerTransport implements MailTransport
         return $value;
     }
 
+    /**
+     * @throws PHPMailerException
+     */
     private function processTemplateVars(array $templateVars, PHPMailer $message)
     {
         foreach ($templateVars as $key => &$parameter) {
@@ -158,6 +192,9 @@ class PhpMailerTransport implements MailTransport
         return $templateVars;
     }
 
+    /**
+     * @return string
+     */
     protected static function generateId()
     {
         $params = [
