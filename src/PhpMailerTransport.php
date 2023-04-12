@@ -35,6 +35,10 @@ use Translate;
 
 class PhpMailerTransport implements MailTransport
 {
+    const TYPE_HTML = 1;
+    const TYPE_TEXT = 2;
+    const TYPE_BOTH = 3;
+
     public function getName(): string
     {
         return $this->l('PHPmailer');
@@ -79,6 +83,7 @@ class PhpMailerTransport implements MailTransport
         $message->MessageID = $this->generateId();
         $message->SMTPAuth = true;
         $message->SMTPDebug = false;
+        $message->isHTML(true);
         $message->Username = $this->getConfig('PS_MAIL_USER', $idShop);
         $message->Password = $this->getConfig('PS_MAIL_PASSWD', $idShop);
         $encryption = $this->getConfig('PS_MAIL_SMTP_ENCRYPTION', $idShop);
@@ -101,15 +106,24 @@ class PhpMailerTransport implements MailTransport
         foreach ($templates as $template) {
             $templateType = $template->getContentType();
             if ($templateType == 'text/html') {
-                $message->isHTML(true);
-                $templateBody = $template->renderTemplate($templateVars);
-                $templateBody = str_replace('{shop_logo}', 'cid:shop_logo', $templateBody);
-                $message->Body = $templateBody;
-            } elseif ($templateType == 'text/plain') {
-                $message->isHTML(false);
-                $templateBody = $template->renderTemplate($templateVars);
-                $message->Body = $templateBody;
+                $htmlBody = $template->renderTemplate($templateVars);
+                $htmlBody = str_replace('{shop_logo}', 'cid:shop_logo', $htmlBody);
             }
+            if ($templateType == 'text/plain') {
+                $txtBody = $template->renderTemplate($templateVars);
+            }
+        }
+        $mailType = (int) $this->getConfig('PS_MAIL_TYPE', $idShop);
+        if (!in_array($mailType, [static::TYPE_BOTH, static::TYPE_TEXT, static::TYPE_HTML])) {
+            $mailType = static::TYPE_BOTH;
+        }
+        $sendTxtContent = $mailType === static::TYPE_BOTH || $mailType === static::TYPE_TEXT;
+        $sendHtmlContent = $mailType === static::TYPE_BOTH || $mailType === static::TYPE_HTML;
+        if ($sendTxtContent) {
+            $message->Body = $txtBody;
+        }
+        if ($sendHtmlContent) {
+            $message->Body = $htmlBody;
         }
         foreach ($attachements as $attachement) {
             $message->addStringAttachment($attachement->getContent(), $attachement->getName());
