@@ -81,6 +81,7 @@ class TbPhpMailer extends Module
         $helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
         $helper->title = $this->displayName;
         $helper->show_toolbar = false;
+        $hasPassword = !!Configuration::get('PS_MAIL_PASSWD');
         return $html . $helper->generateOptions([
             'settings' => [
                 'title' => $this->l('Settings'),
@@ -102,9 +103,13 @@ class TbPhpMailer extends Module
                     'PS_MAIL_PASSWD' => [
                         'title' => $this->l('SMTP password'),
                         'validation' => 'isAnything',
-                        'type' => 'text',
+                        'type' => 'password',
                         'autocomplete' => false,
                         'class' => 'fixed-width-xxl',
+                        'placeholder' => $hasPassword ? $this->l('Use saved password') : null,
+                        'hint' => $hasPassword
+                            ? $this->l('Leave this field empty to keep using saved password')
+                            : $this->l('Leave blank if not applicable.')
                     ],
                     'PS_MAIL_SMTP_ENCRYPTION' => [
                         'title' => $this->l('Encryption'),
@@ -153,6 +158,11 @@ class TbPhpMailer extends Module
         Configuration::updateValue('PS_MAIL_USER', Tools::getValue('PS_MAIL_USER'));
         Configuration::updateValue('PS_MAIL_SMTP_ENCRYPTION', Tools::getValue('PS_MAIL_SMTP_ENCRYPTION'));
         Configuration::updateValue('PS_MAIL_SMTP_PORT', (int) Tools::getValue('PS_MAIL_SMTP_PORT'));
-        Configuration::updateValue('PS_MAIL_PASSWD', Tools::getValue('PS_MAIL_PASSWD'));
+
+        // update password only when set
+        $password = Tools::getValue('PS_MAIL_PASSWD');
+        if ($password !== '' && $password !== false) {
+            Configuration::updateValue('PS_MAIL_PASSWD', $password);
+        }
     }
 }
