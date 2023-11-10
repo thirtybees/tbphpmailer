@@ -116,8 +116,8 @@ class PhpMailerTransport implements MailTransport
         $message->setFrom($fromAddress->getAddress(), $fromAddress->getName());
         $message->Subject = $subject;
         $message->addReplyTo($replyTo->getAddress(), $replyTo->getName());
-        foreach ($toAddresses as $ccAddress) {
-            $message->addCC($ccAddress->getAddress(), $ccAddress->getName());
+        foreach ($toAddresses as $toAddress) {
+            $message->addAddress($toAddress->getAddress(), $toAddress->getName());
         }
         foreach ($bccAddresses as $bccAddress) {
             $message->addBCC($bccAddress->getAddress(), $bccAddress->getName());
