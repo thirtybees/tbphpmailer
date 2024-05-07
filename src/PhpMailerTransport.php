@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2023-2023 thirty bees
+ * Copyright (C) 2017-2024 thirty bees
  *
  * NOTICE OF LICENSE
  *
@@ -14,7 +14,7 @@
  *
  * @author    E-Com <e-com@presta.eu.org>
  * @author    thirty bees <modules@thirtybees.com>
- * @copyright 2023 - 2023 thirty bees
+ * @copyright 2017-2024 thirty bees
  * @license   Academic Free License (AFL 3.0)
  */
 
