@@ -11,7 +11,6 @@ FILES+=("logo.png")
 FILES+=("${CWD_BASENAME}.php")
 FILES+=("translations/**")
 FILES+=("vendor/**")
-FILES+=("views/**")
 FILES+=("src/**")
 
 MODULE_VERSION="$(sed -ne "s/\\\$this->version *= *['\"]\([^'\"]*\)['\"] *;.*/\1/p" ${CWD_BASENAME}.php)"
