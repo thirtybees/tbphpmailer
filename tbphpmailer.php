@@ -49,7 +49,7 @@ class TbPhpMailer extends Module
     {
         $this->name = 'tbphpmailer';
         $this->tab = 'administration';
-        $this->version = '1.0.1';
+        $this->version = '1.1.0';
         $this->author = 'thirty bees';
         $this->controllers = [];
         $this->bootstrap = true;
