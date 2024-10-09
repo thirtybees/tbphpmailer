@@ -34,6 +34,8 @@ class TbPhpMailer extends Module
     const CONFIG_MAIL_PASSWD = 'TBPHPMAILER_MAIL_PASSWD';
     const CONFIG_MAIL_SMTP_ENCRYPTION = 'TBPHPMAILER_MAIL_SMTP_ENCRYPTION';
     const CONFIG_MAIL_SMTP_PORT = 'TBPHPMAILER_MAIL_SMTP_PORT';
+    const CONFIG_SMTP_AUTH = 'TBPHPMAILER_SMTP_AUTH';
+    const CONFIG_SMTP_AUTO_TLS = 'TBPHPMAILER_SMTP_AUTO_TLS';
     const CONFIG_SSL_ALLOW_SELF_SIGN = 'TBPHPMAILER_SSL_ALLOW_SELF_SIGN';
     const CONFIG_SSL_VERIFY_PEER = 'TBPHPMAILER_SSL_VERIFY_PEER' ;
     const CONFIG_SSL_PEER_NAME = 'TBPHPMAILER_SSL_PEER_NAME';
@@ -125,6 +127,12 @@ class TbPhpMailer extends Module
                     'type' => 'text',
                     'class' => 'fixed-width-xxl',
                 ],
+                static::CONFIG_SMTP_AUTH => [
+                    'title' => $this->l('Enable SMTP authentication'),
+                    'hint' => $this->l('If enabled, username nad password will be used to authenticate user on smtp server'),
+                    'cast'  => 'boolval',
+                    'type'  => 'bool',
+                ],
                 static::CONFIG_MAIL_USER => [
                     'title' => $this->l('SMTP username'),
                     'validation' => 'isGenericName',
@@ -162,13 +170,11 @@ class TbPhpMailer extends Module
                         ],
                     ],
                 ],
-                static::CONFIG_MAIL_SMTP_PORT => [
-                    'title' => $this->l('TCP port'),
-                    'desc' => $this->l('The most commonly used ports: for SSL 465, for TLS 587, for none 25.'),
-                    'validation' => 'isInt',
-                    'type' => 'text',
-                    'cast' => 'intval',
-                    'class' => 'fixed-width-sm',
+                static::CONFIG_SMTP_AUTO_TLS => [
+                    'title' => $this->l('Auto TLS'),
+                    'hint' => $this->l('Attempt to automaticaly enable TLS encryption if server supports it'),
+                    'cast'  => 'boolval',
+                    'type'  => 'bool',
                 ],
             ],
             'submit' => [
@@ -219,9 +225,10 @@ class TbPhpMailer extends Module
                 'class' => 'button',
             ],
         ];
+
         return $html . $helper->generateOptions([
             $settingsForm,
-            $sslForm
+            $sslForm,
         ]);
     }
 
@@ -235,6 +242,8 @@ class TbPhpMailer extends Module
         Configuration::updateValue(static::CONFIG_MAIL_USER, Tools::getValue(static::CONFIG_MAIL_USER));
         Configuration::updateValue(static::CONFIG_MAIL_SMTP_ENCRYPTION, Tools::getValue(static::CONFIG_MAIL_SMTP_ENCRYPTION));
         Configuration::updateValue(static::CONFIG_MAIL_SMTP_PORT, (int)Tools::getValue(static::CONFIG_MAIL_SMTP_PORT));
+        Configuration::updateValue(static::CONFIG_SMTP_AUTO_TLS, (int)Tools::getValue(static::CONFIG_SMTP_AUTO_TLS));
+        Configuration::updateValue(static::CONFIG_SMTP_AUTH, (int)Tools::getValue(static::CONFIG_SMTP_AUTH));
         // update password only when set
         $password = Tools::getValue(static::CONFIG_MAIL_PASSWD);
         if ($password !== '' && $password !== false) {
@@ -256,6 +265,8 @@ class TbPhpMailer extends Module
      */
     private function ensureConfiguration()
     {
+        $this->ensureConfigKey(static::CONFIG_SMTP_AUTH, '1');
+        $this->ensureConfigKey(static::CONFIG_SMTP_AUTO_TLS, '1');
         $this->ensureConfigKey(static::CONFIG_MAIL_SERVER, (string)Configuration::get('PS_MAIL_SERVER'));
         $this->ensureConfigKey(static::CONFIG_MAIL_USER, (string)Configuration::get('PS_MAIL_USER'));
         $this->ensureConfigKey(static::CONFIG_MAIL_PASSWD, (string)Configuration::get('PS_MAIL_PASSWD'));
@@ -267,6 +278,7 @@ class TbPhpMailer extends Module
         $this->ensureConfigKey(static::CONFIG_SSL_PEER_NAME, '');
         $this->ensureConfigKey(static::CONFIG_SSL_CA_FILE, '');
         $this->ensureConfigKey(static::CONFIG_SSL_VERIFY_PEER_NAME, '1');
+
         return true;
     }
 
@@ -302,6 +314,8 @@ class TbPhpMailer extends Module
         Configuration::deleteByName(static::CONFIG_SSL_PEER_NAME);
         Configuration::deleteByName(static::CONFIG_SSL_CA_FILE);
         Configuration::deleteByName(static::CONFIG_SSL_VERIFY_PEER_NAME);
+        Configuration::deleteByName(static::CONFIG_SMTP_AUTO_TLS);
+        Configuration::deleteByName(static::CONFIG_SMTP_AUTH);
     }
 
     /**

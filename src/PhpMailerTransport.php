@@ -103,7 +103,7 @@ class PhpMailerTransport implements MailTransport
         $message->CharSet = 'UTF-8';
         $message->Host = $this->getConfig(TbPhpMailer::CONFIG_MAIL_SERVER, $idShop);
         $message->MessageID = $this->generateId();
-        $message->SMTPAuth = true;
+        $message->SMTPAuth = $this->getBoolConfig(TbPhpMailer::CONFIG_SMTP_AUTH, $idShop, true);
         $message->SMTPDebug = false;
         $message->Username = $this->getConfig(TbPhpMailer::CONFIG_MAIL_USER, $idShop);
         $message->Password = $this->getConfig(TbPhpMailer::CONFIG_MAIL_PASSWD, $idShop);
@@ -116,6 +116,7 @@ class PhpMailerTransport implements MailTransport
             $message->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $SMTPOptions['ssl'] = $this->getSSLOptions($idShop);
         }
+        $message->SMTPAutoTLS = $this->getBoolConfig(TbPhpMailer::CONFIG_SMTP_AUTO_TLS, $idShop, true);
         $message->SMTPOptions = $SMTPOptions;
         $message->Port = $this->getIntConfig(TbPhpMailer::CONFIG_MAIL_SMTP_PORT, $idShop);
         $message->setFrom($fromAddress->getAddress(), $fromAddress->getName());
