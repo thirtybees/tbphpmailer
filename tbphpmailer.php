@@ -202,7 +202,7 @@ class TbPhpMailer extends Module
                     'type'  => 'bool',
                 ],
                 static::CONFIG_SSL_ALLOW_SELF_SIGN => [
-                    'title' => $this->l('Allow self-signed certificats'),
+                    'title' => $this->l('Allow self-signed certificates'),
                     'hint' => $this->l('When enabled, mail server can use self-signed certificates. Requires "Verify peer"'),
                     'cast'  => 'boolval',
                     'type'  => 'bool',
