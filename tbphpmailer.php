@@ -170,6 +170,14 @@ class TbPhpMailer extends Module
                         ],
                     ],
                 ],
+                static::CONFIG_MAIL_SMTP_PORT => [
+                    'title' => $this->l('TCP port'),
+                    'desc' => $this->l('The most commonly used ports: for SSL 465, for TLS 587, for none 25.'),
+                    'validation' => 'isInt',
+                    'type' => 'text',
+                    'cast' => 'intval',
+                    'class' => 'fixed-width-sm',
+                ],
                 static::CONFIG_SMTP_AUTO_TLS => [
                     'title' => $this->l('Auto TLS'),
                     'hint' => $this->l('Attempt to automaticaly enable TLS encryption if server supports it'),
@@ -271,7 +279,11 @@ class TbPhpMailer extends Module
         $this->ensureConfigKey(static::CONFIG_MAIL_USER, (string)Configuration::get('PS_MAIL_USER'));
         $this->ensureConfigKey(static::CONFIG_MAIL_PASSWD, (string)Configuration::get('PS_MAIL_PASSWD'));
         $this->ensureConfigKey(static::CONFIG_MAIL_SMTP_ENCRYPTION, static::getEncryptionValue((string)Configuration::get('PS_MAIL_SMTP_ENCRYPTION')));
-        $this->ensureConfigKey(static::CONFIG_MAIL_SMTP_PORT, (string)Configuration::get('PS_MAIL_SMTP_PORT'));
+        $port = (int)Configuration::get('PS_MAIL_SMTP_PORT');
+        if (! $port) {
+            $port = 25;
+        }
+        $this->ensureConfigKey(static::CONFIG_MAIL_SMTP_PORT, (string)$port);
 
         $this->ensureConfigKey(static::CONFIG_SSL_ALLOW_SELF_SIGN, '0');
         $this->ensureConfigKey(static::CONFIG_SSL_VERIFY_PEER, '1');
